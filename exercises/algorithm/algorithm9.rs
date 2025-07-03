@@ -2,7 +2,6 @@
 	heap
 	This question requires you to implement a binary heap function
 */
-// I AM NOT DONE
 
 use std::cmp::Ord;
 use std::default::Default;
@@ -38,6 +37,32 @@ where
 
     pub fn add(&mut self, value: T) {
         //TODO
+        self.items.push(value);
+		self.count += 1;
+        let mut cur_idx = self.count;
+        let mut fa = self.parent_idx(cur_idx);
+		if fa == 0 {
+			return
+		}
+		let mut can_change: bool = false;
+		let val1 = &self.items[cur_idx];
+		let val2 = &self.items[fa];
+		if (self.comparator)(&self.items[cur_idx], &self.items[fa]) {
+			can_change = true;
+		}
+       
+        while can_change {
+            // std::mem::swap(&mut self.items[cur_idx], &mut self.items[fa]);
+			self.items.swap(cur_idx, fa);
+            cur_idx = fa;
+            fa = self.parent_idx(cur_idx);
+			if fa == 0 {
+				return 
+			}
+			if !((self.comparator)(&self.items[cur_idx], &self.items[fa])) {
+				can_change = false;
+			}
+        }
     }
 
     fn parent_idx(&self, idx: usize) -> usize {
@@ -84,8 +109,11 @@ where
     type Item = T;
 
     fn next(&mut self) -> Option<T> {
-        //TODO
-		None
+		if self.count == 0 {
+			return None;
+		}
+		self.count -= 1;
+		Some(self.items.remove(1))
     }
 }
 
@@ -112,7 +140,6 @@ impl MaxHeap {
         Heap::new(|a, b| a > b)
     }
 }
-
 #[cfg(test)]
 mod tests {
     use super::*;

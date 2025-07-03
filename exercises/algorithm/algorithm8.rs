@@ -2,14 +2,14 @@
 	queue
 	This question requires you to use queues to implement the functionality of the stac
 */
-// I AM NOT DONE
+use std::clone::Clone;
 
 #[derive(Debug)]
-pub struct Queue<T> {
+pub struct Queue<T: Clone> {
     elements: Vec<T>,
 }
 
-impl<T> Queue<T> {
+impl<T: Clone> Queue<T> {
     pub fn new() -> Queue<T> {
         Queue {
             elements: Vec::new(),
@@ -42,9 +42,19 @@ impl<T> Queue<T> {
     pub fn is_empty(&self) -> bool {
         self.elements.is_empty()
     }
+
+	pub fn clone(&self) -> Self {
+		let mut res = vec![];
+		for ele in &self.elements {
+			res.push(ele.clone());
+		}
+		Queue {
+			elements: res
+		}
+	}
 }
 
-impl<T> Default for Queue<T> {
+impl<T: Clone> Default for Queue<T> {
     fn default() -> Queue<T> {
         Queue {
             elements: Vec::new(),
@@ -52,32 +62,48 @@ impl<T> Default for Queue<T> {
     }
 }
 
-pub struct myStack<T>
+pub struct myStack<T: Clone>
 {
 	//TODO
 	q1:Queue<T>,
-	q2:Queue<T>
+	q2:Queue<T>,
+	size: usize
 }
-impl<T> myStack<T> {
+impl<T: Clone> myStack<T> {
     pub fn new() -> Self {
         Self {
 			//TODO
+			size: 0,
 			q1:Queue::<T>::new(),
 			q2:Queue::<T>::new()
         }
     }
     pub fn push(&mut self, elem: T) {
         //TODO
+		self.q2.enqueue(elem);
+		while !self.q1.is_empty() {
+			self.q2.enqueue(self.q1.dequeue().unwrap());
+		}
+		self.size += 1;
+		// let temp = self.q2.clone();
+		// self.q2 = self.q1.clone();
+		// self.q1 = temp.clone();
+        std::mem::swap(&mut self.q1, &mut self.q2);
     }
     pub fn pop(&mut self) -> Result<T, &str> {
         //TODO
-		Err("Stack is empty")
+		if self.size == 0 {
+			return Err("Stack is empty")
+		}
+		self.size -= 1;
+		self.q1.dequeue()
     }
     pub fn is_empty(&self) -> bool {
 		//TODO
-        true
+		self.size == 0
     }
 }
+
 
 #[cfg(test)]
 mod tests {

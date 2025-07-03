@@ -3,7 +3,6 @@
 	This question requires you to use a stack to achieve a bracket match
 */
 
-// I AM NOT DONE
 #[derive(Debug)]
 struct Stack<T> {
 	size: usize,
@@ -32,6 +31,8 @@ impl<T> Stack<T> {
 	}
 	fn pop(&mut self) -> Option<T> {
 		// TODO
+		self.data.pop();
+		self.size -= 1;
 		None
 	}
 	fn peek(&self) -> Option<&T> {
@@ -89,6 +90,7 @@ impl<'a, T> Iterator for Iter<'a, T> {
 		self.stack.pop()
 	}
 }
+
 struct IterMut<'a, T: 'a> {
 	stack: Vec<&'a mut T>,
 }
@@ -102,6 +104,46 @@ impl<'a, T> Iterator for IterMut<'a, T> {
 fn bracket_match(bracket: &str) -> bool
 {
 	//TODO
+	let mut s = Stack::new();
+	for c in bracket.chars() {
+		match c {
+			'(' | '{' | '[' => s.push(c),
+			')' => {
+				if s.is_empty() {
+					return false;
+				}
+				let top = s.peek().unwrap();
+				if *top != '(' {
+					return false;
+				}
+				s.pop();
+			}
+			']' => {
+				if s.is_empty() {
+					return false;
+				}
+				let top = s.peek().unwrap();
+				if *top != '[' {
+					return false;
+				}
+				s.pop();
+			}
+			'}' => {
+				if s.is_empty() {
+					return false;
+				}
+				let top = s.peek().unwrap();
+				if *top != '{' {
+					return false;
+				}
+				s.pop();
+			}
+			_ => {}
+		}
+	}
+	if !s.is_empty() {
+		return false;
+	}
 	true
 }
 
@@ -140,3 +182,4 @@ mod tests {
 		assert_eq!(bracket_match(s),true);
 	}
 }
+

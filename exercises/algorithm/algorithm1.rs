@@ -2,7 +2,6 @@
 	single linked list merge
 	This problem requires you to merge two ordered singly linked lists into one ordered singly linked list
 */
-// I AM NOT DONE
 
 use std::fmt::{self, Display, Formatter};
 use std::ptr::NonNull;
@@ -22,6 +21,7 @@ impl<T> Node<T> {
         }
     }
 }
+
 #[derive(Debug)]
 struct LinkedList<T> {
     length: u32,
@@ -29,13 +29,13 @@ struct LinkedList<T> {
     end: Option<NonNull<Node<T>>>,
 }
 
-impl<T> Default for LinkedList<T> {
+impl<T: std::cmp::PartialOrd + Clone> Default for LinkedList<T> {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl<T> LinkedList<T> {
+impl<T: std::cmp::PartialOrd + Clone> LinkedList<T> {
     pub fn new() -> Self {
         Self {
             length: 0,
@@ -69,14 +69,44 @@ impl<T> LinkedList<T> {
             },
         }
     }
-	pub fn merge(list_a:LinkedList<T>,list_b:LinkedList<T>) -> Self
+	pub fn merge(list_a:LinkedList<T>, list_b:LinkedList<T>) -> Self
 	{
 		//TODO
-		Self {
-            length: 0,
-            start: None,
-            end: None,
+        let mut current1 = list_a.start;
+        let mut current2 = list_b.start;
+        let mut res = Self::new();
+        let size1 = list_a.length;
+        let size2 = list_b.length;
+        let mut i = 0;
+        let mut j = 0;
+        while i < size1 && j < size2 {
+            let val1 = unsafe { &(*current1.unwrap().as_ptr()).val };
+            let val2 = unsafe { &(*current2.unwrap().as_ptr()).val };
+            if *val1 < *val2 {
+                res.add((*val1).clone());
+                i += 1;
+                current1 = unsafe { (*current1.unwrap().as_ptr()).next };
+            } else {
+                res.add((*val2).clone());
+                j += 1;
+                current2 = unsafe { (*current2.unwrap().as_ptr()).next };
+            }
         }
+        
+        while i < size1 {
+            let val = unsafe { &(*current1.unwrap().as_ptr()).val };
+            res.add((*val).clone());
+            i += 1;
+            current1 = unsafe { (*current1.unwrap().as_ptr()).next };
+        }
+        
+        while j < size2 {
+            let val = unsafe { &(*current2.unwrap().as_ptr()).val };
+            res.add((*val).clone());
+            j += 1;
+            current2 = unsafe { (*current2.unwrap().as_ptr()).next };
+        }
+        res
 	}
 }
 
